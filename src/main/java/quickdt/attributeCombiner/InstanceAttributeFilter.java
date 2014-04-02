@@ -18,6 +18,7 @@ public class InstanceAttributeFilter implements Function<AbstractInstance, Insta
 
     @Override
     public Instance apply(final AbstractInstance instance) {
+        //returns an instance with fewer attributes
         HashMapAttributes newAttributes = new HashMapAttributes();
         for (String permittedAttribute : attributesToPermit) {
             newAttributes.put(permittedAttribute, instance.getAttributes().get(permittedAttribute));

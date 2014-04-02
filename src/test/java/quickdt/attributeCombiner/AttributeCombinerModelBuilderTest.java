@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 import quickdt.*;
+import quickdt.calibratedPredictiveModel.PAVCalibratedPredictiveModelBuilder;
 import quickdt.experiments.crossValidation.CrossValidator;
 import quickdt.inspection.AttributeImportanceFinder;
 import quickdt.inspection.AttributeScore;
@@ -33,7 +34,7 @@ public class AttributeCombinerModelBuilderTest {
             logger.info(attributeScore.toString());
         }
 
-        CrossValidator crossValidator = new CrossValidator(4, 2);
+        CrossValidator crossValidator = new CrossValidator(4, 3);
         double rfLoss = crossValidator.getCrossValidatedLoss(new RandomForestBuilder(), moboDataset);
 
         ArrayList<String> topAttributes = Lists.newArrayList(Iterables.limit(Iterables.transform(attributeScores.descendingSet(), new Function<AttributeScore, String>() {
@@ -41,16 +42,17 @@ public class AttributeCombinerModelBuilderTest {
             public String apply(final AttributeScore attributeScore) {
                 return attributeScore.getAttribute();
             }
-        }), 9));
+        }), 8));
 
         logger.info("Top attributes: "+topAttributes);
 
+        //create all distinct pairs
         Set<Set<String>> attributesToCombine = Sets.newHashSet();
-        for (int first = 0; first < topAttributes.size(); first++) {
-            for (int second = 0; second < topAttributes.size(); second++) {
-                if (first == second) continue;
-                attributesToCombine.add(Sets.newHashSet(topAttributes.get(first), topAttributes.get(second)));
-            }
+        for (int first = 1; first < topAttributes.size(); first+=2) {
+//            for (int second = 0; second < topAttributes.size(); second++) {
+  //              if (first == second) continue;
+                attributesToCombine.add(Sets.newHashSet(topAttributes.get(first), topAttributes.get(first - 1)));
+
         }
 
         logger.info("Creating "+attributesToCombine.size()+" new attributes");
